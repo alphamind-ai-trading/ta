@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 Analisi Tecnica Bitcoin - Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .positive {
+            color: #10b981 !important;
+        }
+
+        .negative {
+            color: #ef4444 !important;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+
+        .chart-title {
+            font-size: 1.3em;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        canvas {
+            max-height: 400px !important;
+        }
+
+        table {
+            width: 100%;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 30px;
+            padding: 20px;
+        }
+
+        .indicator-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .badge-neutral {
+            background: #fbbf24;
+            color: white;
+        }
+
+        .badge-buy {
+            background: #10b981;
+            color: white;
+        }
+
+        .badge-sell {
+            background: #ef4444;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 Analisi Tecnica Bitcoin</h1>
+            <p class="subtitle">Dashboard Interattiva con Indicatori in Tempo Reale</p>
+        </header>
+
+        <!-- Statistiche Principali -->
+        <div class="stats-grid" id="statsGrid"></div>
+
+        <!-- Grafico Prezzo + Bollinger Bands -->
+        <div class="chart-container">
+            <h3 class="chart-title">💹 Prezzo Bitcoin & Bollinger Bands</h3>
+            <canvas id="priceChart"></canvas>
+        </div>
+
+        <!-- Grafico RSI -->
+        <div class="chart-container">
+            <h3 class="chart-title">📈 RSI (Relative Strength Index)</h3>
+            <canvas id="rsiChart"></canvas>
+        </div>
+
+        <!-- Grafico MACD -->
+        <div class="chart-container">
+            <h3 class="chart-title">📉 MACD (Moving Average Convergence Divergence)</h3>
+            <canvas id="macdChart"></canvas>
+        </div>
+
+        <!-- Grafico Volume & MFI -->
+        <div class="chart-container">
+            <h3 class="chart-title">📊 Volume & Money Flow Index</h3>
+            <canvas id="volumeChart"></canvas>
+        </div>
+
+        <!-- Tabella Dati -->
+        <div class="chart-container">
+            <h3 class="chart-title">📋 Ultimi 20 Valori</h3>
+            <div style="overflow-x: auto;">
+                <table id="dataTable">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Prezzo</th>
+                            <th>RSI</th>
+                            <th>MACD</th>
+                            <th>BB Mid</th>
+                            <th>ATR</th>
+                            <th>MFI</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>🚀 Generato con la libreria TA (Technical Analysis) Python</p>
+            <p>📚 <a href="https://technical-analysis-library-in-python.readthedocs.io/" style="color: white;">Documentazione</a></p>
+        </div>
+    </div>
+
+    <script>
+        // Carica dati JSON
+        fetch('analisi_bitcoin.json')
+            .then(response => response.json())
+            .then(data => {
+                renderStats(data.stats);
+                renderCharts(data.chart_data);
+                renderTable(data.table_data);
+            })
+            .catch(error => console.error('Errore caricamento dati:', error));
+
+        function renderStats(stats) {
+            const grid = document.getElementById('statsGrid');
+            const variazione = stats.prezzo.variazione_pct;
+            const varClass = variazione >= 0 ? 'positive' : 'negative';
+            const varSign = variazione >= 0 ? '+' : '';
+
+            // RSI Segnale
+            let rsiSignal = '';
+            let rsiClass = '';
+            if (stats.indicatori_attuali.rsi > 70) {
+                rsiSignal = 'IPERCOMPRATO';
+                rsiClass = 'badge-sell';
+            } else if (stats.indicatori_attuali.rsi < 30) {
+                rsiSignal = 'IPERVENDUTO';
+                rsiClass = 'badge-buy';
+            } else {
+                rsiSignal = 'NEUTRALE';
+                rsiClass = 'badge-neutral';
+            }
+
+            grid.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-label">Prezzo Attuale</div>
+                    <div class="stat-value">$${stats.prezzo.attuale.toLocaleString('it-IT', {minimumFractionDigits: 2})}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Variazione</div>
+                    <div class="stat-value ${varClass}">${varSign}${variazione.toFixed(2)}%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Min / Max</div>
+                    <div class="stat-value" style="font-size: 1.3em;">
+                        $${stats.prezzo.minimo.toLocaleString('it-IT', {minimumFractionDigits: 0})} / $${stats.prezzo.massimo.toLocaleString('it-IT', {minimumFractionDigits: 0})}
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">RSI</div>
+                    <div class="stat-value">${stats.indicatori_attuali.rsi.toFixed(2)}</div>
+                    <span class="indicator-badge ${rsiClass}">${rsiSignal}</span>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">MACD</div>
+                    <div class="stat-value" style="font-size: 1.5em;">${stats.indicatori_attuali.macd.toFixed(2)}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">MFI</div>
+                    <div class="stat-value">${stats.indicatori_attuali.mfi.toFixed(2)}</div>
+                </div>
+            `;
+        }
+
+        function renderCharts(chartData) {
+            const labels = chartData.map(d => d.Date);
+            const closes = chartData.map(d => d.Close);
+            const volumes = chartData.map(d => d.Volume_BTC);
+
+            // Grafico Prezzo + Bollinger Bands
+            new Chart(document.getElementById('priceChart'), {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Prezzo',
+                            data: closes,
+                            borderColor: '#667eea',
+                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                            borderWidth: 2,
+                            fill: true
+                        },
+                        {
+                            label: 'BB Superior',
+                            data: chartData.map(d => d.bb_high),
+                            borderColor: '#ef4444',
+                            borderWidth: 1,
+                            borderDash: [5, 5],
+                            fill: false
+                        },
+                        {
+                            label: 'BB Media',
+                            data: chartData.map(d => d.bb_mid),
+                            borderColor: '#fbbf24',
+                            borderWidth: 1,
+                            fill: false
+                        },
+                        {
+                            label: 'BB Inferior',
+                            data: chartData.map(d => d.bb_low),
+                            borderColor: '#10b981',
+                            borderWidth: 1,
+                            borderDash: [5, 5],
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    scales: {
+                        x: { display: false },
+                        y: { beginAtZero: false }
+                    }
+                }
+            });
+
+            // Grafico RSI
+            new Chart(document.getElementById('rsiChart'), {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'RSI',
+                        data: chartData.map(d => d.rsi),
+                        borderColor: '#8b5cf6',
+                        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                        borderWidth: 2,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { display: false },
+                        y: {
+                            min: 0,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    if (value === 70) return '70 (Ipercomprato)';
+                                    if (value === 30) return '30 (Ipervenduto)';
+                                    return value;
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        annotation: {
+                            annotations: {
+                                line1: {
+                                    type: 'line',
+                                    yMin: 70,
+                                    yMax: 70,
+                                    borderColor: 'red',
+                                    borderWidth: 2,
+                                    borderDash: [5, 5]
+                                },
+                                line2: {
+                                    type: 'line',
+                                    yMin: 30,
+                                    yMax: 30,
+                                    borderColor: 'green',
+                                    borderWidth: 2,
+                                    borderDash: [5, 5]
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Grafico MACD
+            new Chart(document.getElementById('macdChart'), {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'MACD',
+                            data: chartData.map(d => d.macd),
+                            borderColor: '#3b82f6',
+                            borderWidth: 2,
+                            fill: false
+                        },
+                        {
+                            label: 'Signal',
+                            data: chartData.map(d => d.macd_signal),
+                            borderColor: '#ef4444',
+                            borderWidth: 2,
+                            fill: false
+                        },
+                        {
+                            label: 'Histogram',
+                            data: chartData.map(d => d.macd_diff),
+                            type: 'bar',
+                            backgroundColor: 'rgba(16, 185, 129, 0.5)',
+                            borderColor: '#10b981',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { display: false }
+                    }
+                }
+            });
+
+            // Grafico Volume
+            new Chart(document.getElementById('volumeChart'), {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Volume BTC',
+                            data: volumes,
+                            backgroundColor: 'rgba(102, 126, 234, 0.5)',
+                            borderColor: '#667eea',
+                            borderWidth: 1,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'MFI',
+                            data: chartData.map(d => d.mfi),
+                            type: 'line',
+                            borderColor: '#f59e0b',
+                            borderWidth: 2,
+                            fill: false,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { display: false },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left'
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            min: 0,
+                            max: 100,
+                            grid: {
+                                drawOnChartArea: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderTable(tableData) {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = tableData.reverse().map(row => `
+                <tr>
+                    <td><strong>${row.Date}</strong></td>
+                    <td>$${row.Close.toLocaleString('it-IT', {minimumFractionDigits: 2})}</td>
+                    <td>${row.rsi.toFixed(2)}</td>
+                    <td>${row.macd.toFixed(2)}</td>
+                    <td>$${row.bb_mid.toFixed(2)}</td>
+                    <td>${row.atr.toFixed(2)}</td>
+                    <td>${row.mfi.toFixed(2)}</td>
+                </tr>
+            `).join('');
+        }
+    </script>
+</body>
+</html>
