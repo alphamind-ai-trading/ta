@@ -1,0 +1,113 @@
+=============================================================================
+         📊 ANALISI TECNICA BITCOIN - RISULTATI DASHBOARD
+=============================================================================
+
+📅 PERIODO ANALIZZATO: 2017-07-23 → 2017-08-22 (30 giorni)
+
+=============================================================================
+                        💰 PREZZO BITCOIN
+=============================================================================
+
+Prezzo Attuale:        $3,934.21
+Prezzo Minimo:         $2,430.25
+Prezzo Massimo:        $4,467.82
+Prezzo Medio:          $3,339.10
+
+📈 VARIAZIONE:         +41.17%   (POSITIVA!)
+
+=============================================================================
+                     📊 INDICATORI TECNICI ATTUALI
+=============================================================================
+
+🔵 RSI (Relative Strength Index): 52.09
+   Status: 🟡 NEUTRALE
+   Nota: Valore tra 30-70, nessun segnale estremo
+   (>70 = Ipercomprato, <30 = Ipervenduto)
+
+📈 MACD (Moving Average Convergence Divergence):
+   MACD:           -35.19
+   Signal:         -49.36
+   Divergenza:     +14.17
+   Status: 📈 RIALZISTA (MACD convergente verso signal)
+
+💹 MFI (Money Flow Index): 36.42
+   Status: Flusso monetario neutrale
+   (<20 = Vendita forte, >80 = Acquisto forte)
+
+🌊 ATR (Average True Range): 71.13
+   Status: Volatilità moderata
+
+💪 ADX (Average Directional Index): 32.65
+   Status: Trend di media forza (>25 indica trend definito)
+
+=============================================================================
+                        📋 ULTIMI 5 VALORI
+=============================================================================
+
+Data/Ora            | Prezzo  |  RSI   |  MACD  |  MFI   |  ATR
+--------------------|---------|--------|--------|--------|--------
+2017-08-22 08:00    | $3,795  |  37.59 | -69.40 |  25.13 |  71.19
+2017-08-22 09:00    | $3,923  |  50.83 | -57.65 |  31.22 |  75.52
+2017-08-22 10:00    | $3,879  |  47.13 | -51.28 |  34.14 |  74.28
+2017-08-22 11:00    | $3,899  |  48.95 | -44.12 |  33.77 |  71.47
+2017-08-22 12:00    | $3,934  |  52.09 | -35.19 |  36.42 |  71.13
+
+=============================================================================
+                        🎯 INTERPRETAZIONE
+=============================================================================
+
+✅ RSI NEUTRALE (52.09)
+   Il mercato non è né ipercomprato né ipervenduto.
+   Situazione equilibrata.
+
+✅ MACD RIALZISTA
+   MACD sta convergendo verso la linea signal con divergenza positiva.
+   Segnale di possibile momentum rialzista in arrivo.
+
+✅ MFI NEUTRALE (36.42)
+   Flusso monetario equilibrato, leggermente sotto il livello 50.
+   Nessuna pressione estrema di acquisto o vendita.
+
+✅ VOLATILITÀ MODERATA
+   ATR a 71.13 indica movimenti di prezzo normali per Bitcoin.
+
+✅ TREND DEFINITO
+   ADX a 32.65 suggerisce presenza di un trend (sopra 25).
+
+=============================================================================
+                    📊 GRAFICI INTERATTIVI DISPONIBILI
+=============================================================================
+
+La dashboard HTML completa include:
+
+1. 📈 Grafico Prezzo + Bollinger Bands (con 3 bande)
+2. 📊 Grafico RSI (con linee a 30 e 70)
+3. 📉 Grafico MACD (con signal e histogram)
+4. 📊 Grafico Volume + MFI (doppio asse)
+
+File: dashboard_standalone.html
+Dimensione: 260 KB
+Tipo: HTML standalone (funziona senza server)
+
+=============================================================================
+                        🔄 USARE DATI FRESCHI
+=============================================================================
+
+Per aggiornare con dati Bitcoin attuali:
+
+1. Ottieni un file CSV con dati Bitcoin
+   (da Kaggle, TradingView, CryptoDataDownload)
+
+2. Modifica file: analisi_completa.py (riga 17)
+   Cambia: input_file = 'tuoi_dati_freschi.csv'
+
+3. Esegui: python analisi_completa.py
+
+4. Riapri la dashboard aggiornata!
+
+=============================================================================
+
+✅ Analisi completata con 15+ indicatori tecnici!
+🚀 Powered by TA (Technical Analysis) Python Library
+
+=============================================================================
